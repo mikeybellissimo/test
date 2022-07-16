@@ -11,9 +11,18 @@
 import UdpComms as U
 import time
 import pandas as pd
+import random
 
 # Create UDP socket to use for sending (and receiving)
 sock = U.UdpComms(udpIP="127.0.0.1", portTX=8000, portRX=8001, enableRX=True, suppressWarnings=True)
+shouldSend = False
+children = []
+parents = []
+for i in range(100):
+    new_child = random.randint(0,20)
+    children.append(str(new_child))
+    new_parent = random.randint(0,20)
+    parents.append(str(new_parent))
 
 
 while True:
@@ -27,15 +36,24 @@ while True:
     'value_type' : ['class', 'class', 'class', 'class'], 
     'probabilitiies' : [0.99, 0.01, 0.999, 0.001]})
     
+    taxonomy = pd.DataFrame()
+
+    taxonomy['children'] = children
+    taxonomy['parents'] = parents
+
+    
+
 
     # combine all the different knowledge sources into one json string to pass through to unity 
-    buffered_json = '{"taxonomy" : ' + taxonomy.to_json() +  ', "relations" : ' + relations.to_json() + ', "distributions" : ' + distributions.to_json() + ', "discrete_probabilities" : ' + discrete_probabilities.to_json() + "}" 
-    print(buffered_json)
-    sock.SendData(buffered_json) # Send this string to other application
+    buffered_json = '{"taxonomy" : ' + taxonomy.to_json() +  ', "relations" : ' + relations.to_json() + ', "distributions" : ' + distributions.to_json() + ', "discrete_probabilities" : ' + discrete_probabilities.to_json() + " }"
+
     
-    data = sock.ReadReceivedData() # read data
+    
+    data = sock.ReadReceivedData()
 
-    if data != None: # if NEW data has been received since last ReadReceivedData function call
-        print(data) # print new received data
+    if data == "Please Sir, may I have some more?":
+        
+        sock.SendData(buffered_json) # Send this string to other application
+        print(data)
+        data = None
 
-    time.sleep(1)

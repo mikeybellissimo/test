@@ -26,7 +26,7 @@ class UdpComms():
         self.suppressWarnings = suppressWarnings # when true warnings are suppressed
         self.isDataReceived = False
         self.dataRX = None
-
+        
         # Connect via UDP
         self.udpSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # internet protocol, udp (DGRAM) socket
         self.udpSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # allows the address/port to be reused immediately instead of it being stuck in the TIME_WAIT state waiting for late packets to arrive.

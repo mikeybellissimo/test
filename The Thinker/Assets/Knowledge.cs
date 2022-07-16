@@ -5,20 +5,29 @@ using Leguar.TotalJSON;
 
 public class Knowledge : MonoBehaviour
 {
-
+    public static Knowledge knowledge;
     public Taxonomy taxonomy;
     public Relations relations;
     public Distributions distributions;
     public Discrete_Probabilites discrete_probabilities;
+    public static bool isAwaiting = true;
+    
 
     public static void ParseResponse(string text){
-        print(text);
-        Knowledge knowledge = JSON.ParseString(text).Deserialize<Knowledge>();
+        
+        knowledge = JSON.ParseString(text).Deserialize<Knowledge>();
+        
+        isAwaiting = false;
         
     }
 
     
     
+
+
+
+    
+
     public class Taxonomy
     {
         public Dictionary<string,string> children;

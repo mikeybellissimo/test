@@ -36,25 +36,25 @@ public class UdpSocket : MonoBehaviour
     [SerializeField] int rxPort = 8000; // port to receive data from Python on
     [SerializeField] int txPort = 8001; // port to send data to Python on
 
-    int i = 0; // DELETE THIS: Added to show sending data from Unity to Python via UDP
-
+    
+    
     // Create necessary UdpClient objects
     UdpClient client;
     IPEndPoint remoteEndPoint;
     Thread receiveThread; // Receiving Thread
-    
+    bool dataReceived = false;
     string lastText = "";
 
 
 
     IEnumerator SendDataCoroutine() // DELETE THIS: Added to show sending data from Unity to Python via UDP
     {
-        while (true)
+        while(!dataReceived)
         {
-            SendData("Sent from Unity: " + i.ToString());
-            i++;
+            SendData("Please Sir, may I have some more?");
             yield return new WaitForSeconds(1f);
         }
+            
     }
 
     public void SendData(string message) // Use to send data to Python
@@ -93,7 +93,7 @@ public class UdpSocket : MonoBehaviour
     // Receive data, update packets received
     private void ReceiveData()
     {
-        while (true)
+        while (dataReceived == false)
         {
             try
             {
@@ -108,6 +108,7 @@ public class UdpSocket : MonoBehaviour
                 
                 ProcessInput(text);
                 Knowledge.ParseResponse(text);
+                dataReceived = true;
             }
             catch (Exception err)
             {
