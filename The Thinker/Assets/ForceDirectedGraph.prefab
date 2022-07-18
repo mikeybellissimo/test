@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2310544486306477870
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2310544486306477864}
+  - component: {fileID: 2310544486306477865}
+  - component: {fileID: 2310544486306477867}
+  m_Layer: 0
+  m_Name: ForceDirectedGraph
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2310544486306477864
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2310544486306477870}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2310544486306477865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2310544486306477870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ba19bbb5fec5414887a783e1e19b819, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nodePrefab: {fileID: 8796606234490251059, guid: 8d8f8ef57d2cee147acc0b07ec3735e5,
+    type: 3}
+  edgePrefab: {fileID: 665318285195650897, guid: 5fc96d020308db34e923e8f0a99a3ca2,
+    type: 3}
+  edgeMaterial: {fileID: 2100000, guid: eb47a079215a37a439f46f0ecda01a92, type: 2}
+  rootNodeName: animal
+  normalEdgeWidth: 0.05
+  selectedEdgeWidth: 0.1
+  maxSpeed: 11.93
+  sizeOfSpace: 18.6
+  anchorForce: 1
+  startSpace: 4
+  repulsionStrength: 57.94
+  repulsionDistance: 7.4
+  attractionStrength: 0.01
+--- !u!114 &2310544486306477867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2310544486306477870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7049689062d86f14ea339664a8bad281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectedNode: {fileID: 0}
+  selectedNodeMaterial: {fileID: 2100000, guid: f254c714585b28642be0932394aad994,
+    type: 2}
+  normalEdgeMaterial: {fileID: 2100000, guid: eb47a079215a37a439f46f0ecda01a92, type: 2}
+  normalNodeMaterial: {fileID: 2100000, guid: 250e3307d25785a4d9360c1f52247765, type: 2}

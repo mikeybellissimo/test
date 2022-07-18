@@ -16,19 +16,20 @@ import random
 # Create UDP socket to use for sending (and receiving)
 sock = U.UdpComms(udpIP="127.0.0.1", portTX=8000, portRX=8001, enableRX=True, suppressWarnings=True)
 shouldSend = False
-children = []
-parents = []
-for i in range(100):
-    new_child = random.randint(0,20)
-    children.append(str(new_child))
-    new_parent = random.randint(0,20)
-    parents.append(str(new_parent))
+#create random data logic
+#children = []
+#parents = []
+#for i in range(100):
+#    new_child = random.randint(0,20)
+#    children.append(str(new_child))
+#    new_parent = random.randint(0,20)
+#    parents.append(str(new_parent))
 
 
 while True:
 
 
-    taxonomy = pd.DataFrame({'children' : ['human', 'primate', 'mammal'], 'parents' : ['primate', 'mammal', 'animal']})
+    taxonomy = pd.DataFrame({'children' : ['human', 'primate', 'mammal', 'snake', 'reptile'], 'parents' : ['primate', 'mammal', 'animal', 'reptile', 'animal']})
     relations = pd.DataFrame({'entity' : ['human', 'primate', 'mammal'], 'relationship' : ['hasSize', 'hasBodyPart', 'birthType'], 'distribution' : [0, 1, 2]})
     distributions = pd.DataFrame({'id' : [0,1,2], 'type' : ['normal', 'discrete', 'discrete'], 'mean' : [.1778, 0, 0], 'variance' : [.01016, 0 , 0 ], 'discrete_id' : ['0', 'a1', 'a2']})
     discrete_probabilities = pd.DataFrame({'discrete_id' : ['a1', 'a1', 'a2', 'a2'], 
@@ -36,10 +37,10 @@ while True:
     'value_type' : ['class', 'class', 'class', 'class'], 
     'probabilitiies' : [0.99, 0.01, 0.999, 0.001]})
     
-    taxonomy = pd.DataFrame()
-
-    taxonomy['children'] = children
-    taxonomy['parents'] = parents
+    #Uncomment the following to use the random data for the taxonomy
+    #taxonomy = pd.DataFrame()
+    #taxonomy['children'] = children
+    #taxonomy['parents'] = parents
 
     
 

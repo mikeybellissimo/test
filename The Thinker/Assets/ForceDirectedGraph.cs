@@ -8,17 +8,23 @@ public class ForceDirectedGraph : MonoBehaviour
 
 
     bool isWaiting = true;
-    
-    Dictionary<string, Node> nodes;
-    Dictionary<string, Edge> edges;
+    UserInput userInput;
+    public Dictionary<string, Node> nodes;
+    public Dictionary<string, Edge> edges;
     Vector3 centerOfGraph = Vector3.zero;
     
     Knowledge knowledge;
     public GameObject nodePrefab;
     public GameObject edgePrefab;
     public Material edgeMaterial;
+    
+    public string rootNodeName;
 
-    public float maxDistance = 30;
+    public float normalEdgeWidth = 0.05f;
+    public float selectedEdgeWidth = 0.1f;
+
+    public float maxSpeed;
+    public float sizeOfSpace = 30;
     public float anchorForce = 1;
     public int startSpace = 5;
     public float repulsionStrength = 10;
@@ -31,6 +37,7 @@ public class ForceDirectedGraph : MonoBehaviour
     {
         nodes = new Dictionary<string, Node>();
         edges = new Dictionary<string, Edge>();
+        userInput = GetComponent<UserInput>();
         SetupKnowledgeBase();
 
     } 
@@ -59,13 +66,13 @@ public class ForceDirectedGraph : MonoBehaviour
     }
     
     private Node node1;
+    private Rigidbody node1Rigid;
     private Node node2;
     Vector3 placeItShouldBe;
     Vector3 attractiveForce;
     Vector3 repulsiveForce;
     void ApplyForces()
     {
-
         //all attached nodes attract
         
         foreach (KeyValuePair<string, Edge> p in edges)
@@ -74,8 +81,6 @@ public class ForceDirectedGraph : MonoBehaviour
             attractiveForce = ComputeAttractiveForce(edge);
             edge.node1.forces += attractiveForce;
             edge.node2.forces -= attractiveForce;
-            
-
         }
         //all nodes repulse eachother
         // i and j are used to skip over the ones that have already been done so as to not double count them
@@ -99,34 +104,62 @@ public class ForceDirectedGraph : MonoBehaviour
                 {
                     repulsiveForce = CalculateRepulsiveForce(node1, node2);
                     node1.forces += repulsiveForce;
-                    node2.forces += repulsiveForce;
-                    print(repulsiveForce);
+                    node2.forces += -repulsiveForce;
                     
 
                 }
             }
             i++;
-            centerOfGraph += (1.0f/nodes.Count) * node1.transform.position;
-            //distance from 0 is equal to position of node
-            placeItShouldBe = node1.transform.position - centerOfGraph; 
-            print((-anchorForce * ( node1.transform.position - placeItShouldBe)).normalized);
-            
-            node1.forces += (-anchorForce * ( node1.transform.position - placeItShouldBe)).normalized;
-            if(Vector3.Distance(node1.transform.position, centerOfGraph) > maxDistance)
-            {
-                node1.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                node1.forces = -transform.position;
-            } 
-            //apply force here and zero it out right after
-            node1.GetComponent<Rigidbody>().AddForce(node1.forces.normalized );
-            
-            centerOfGraph = Vector3.zero;
-            node1.forces = Vector3.zero;
+            ApplyCalculatedForces(node1);
+
         }
         
         
         
 
+    }
+    string frozenNode;
+    void ApplyCalculatedForces(Node node1)
+    {
+        
+        if(userInput.selectedNode == null)
+        {
+            frozenNode = "";
+        }
+        else{
+            frozenNode = userInput.selectedNode.name;
+        }
+
+        centerOfGraph += (1.0f/nodes.Count) * node1.transform.position;
+        //distance from 0 is equal to position of node
+        placeItShouldBe = node1.transform.position - centerOfGraph; 
+        
+        node1.forces += (-anchorForce * ( node1.transform.position - placeItShouldBe)).normalized;
+        node1Rigid = node1.GetComponent<Rigidbody>();
+        //apply force here and zero it out right after.
+        //if going too fast or is supposed to be frozen set the speed to 0 or doesn't have a connection to the thing thats frozen when somethings selected
+        if(node1Rigid.velocity.magnitude > maxSpeed | node1.isFrozen | ( !node1.IsConnectedToFrozen(frozenNode) & userInput.selectedNode != null))
+        {
+            node1Rigid.velocity = Vector3.zero;
+        }
+        //if past max distance then stop and send towards center
+        else if(Vector3.Magnitude(node1.transform.position) > sizeOfSpace)
+        {
+            node1Rigid.velocity = Vector3.zero;
+            node1Rigid.AddForce(-node1.transform.position );
+
+        } 
+        
+         
+        //default case
+        else
+        {
+            node1Rigid.AddForce(node1.forces.normalized );
+        }
+            
+        
+        centerOfGraph = Vector3.zero;
+        node1.forces = Vector3.zero;
     }
 
     void UpdateEdges()
@@ -144,6 +177,8 @@ public class ForceDirectedGraph : MonoBehaviour
 
     }
 
+    GameObject newNode;
+    Node newNodeComponent;
     //loop through data and create nodes
     void CreateNodes()
     {
@@ -154,20 +189,33 @@ public class ForceDirectedGraph : MonoBehaviour
             //make sure the node doesn't already exist
             if(!nodes.ContainsKey(value))
             {   
-                GameObject newNode = Instantiate(nodePrefab, new Vector3(Random.Range(-startSpace, startSpace), Random.Range(-startSpace, startSpace),Random.Range(-startSpace, startSpace) ), Quaternion.identity);
-                newNode.name = value;
-                nodes[value] = newNode.GetComponent<Node>();
+                CreateNode(value);
                 
             }
             
         }
-        //delete this when you have real data 
         
+        //add the root node 
+        CreateNode(rootNodeName);
 
-        //add the root node in the real thing
 
 
+    }
 
+    void CreateNode(string nameOfNode)
+    {
+        if(nameOfNode == rootNodeName)
+        {
+            newNode = Instantiate(nodePrefab, new Vector3(0,0,0 ), Quaternion.identity);
+        } else
+        {
+            newNode = Instantiate(nodePrefab, new Vector3(Random.Range(-startSpace, startSpace), Random.Range(-startSpace, startSpace),Random.Range(-startSpace, startSpace) ), Quaternion.identity);
+        }
+        newNode.transform.SetParent(transform);
+        newNode.name = nameOfNode;
+        newNodeComponent = newNode.GetComponent<Node>();
+        newNodeComponent.Construct(nameOfNode);
+        nodes[nameOfNode] = newNodeComponent;
     }
 
 
@@ -176,15 +224,10 @@ public class ForceDirectedGraph : MonoBehaviour
     {
         foreach(KeyValuePair<string, string> p in knowledge.taxonomy.children)
         {
-            
+
             CreateEdge(nodes[p.Value], nodes[knowledge.taxonomy.parents[p.Key]]);
+
         }
-            
-
-
-
-
-
 
     }
 
@@ -192,16 +235,23 @@ public class ForceDirectedGraph : MonoBehaviour
     //Create the edge
     void CreateEdge(Node start, Node end)
     {
+        
         if(!edges.ContainsKey(start.name + end.name) | edges.ContainsKey(end.name + start.name))
         {
+            
             GameObject edgeObj = Instantiate(edgePrefab);
+            edgeObj.transform.SetParent(transform);
             LineRenderer lr = edgeObj.GetComponent<LineRenderer>();
             Edge edge = edgeObj.GetComponent<Edge>();
             edge.node1 = start;
             edge.node2 = end;
+            //node1 and node2 (in that order) get their neighbors dictionary more filled out 
+            nodes[start.name].neighbors[end.name] = end;
+            nodes[end.name].neighbors[start.name] = start;
             lr.SetPosition(0, start.gameObject.transform.position);
             lr.SetPosition(1, end.gameObject.transform.position);
             edges[start.name + end.name] = edge;
+            
         }
             
     }
